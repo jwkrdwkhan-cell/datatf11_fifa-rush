@@ -1,0 +1,5 @@
+cloudscraper
+pandas
+pytz
+requests
+playwright
