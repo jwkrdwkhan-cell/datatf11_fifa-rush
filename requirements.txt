@@ -1,6 +1,0 @@
-cloudscraper
-pandas
-pytz
-requests
-playwright
-python-telegram-bot==20.7
