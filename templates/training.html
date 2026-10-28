@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التدريب وإدارة القفل - Albrazily AI</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: #131b2e;
+            --accent: #ff2a2a;
+            --accent-glow: rgba(255, 42, 42, 0.4);
+            --text-color: #f3f4f6;
+            --border-color: #1f293d;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        
+        .training-card {
+            background: var(--panel-bg); border: 1px solid var(--border-color);
+            border-radius: 16px; width: 100%; max-width: 600px; padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h1 { color: var(--accent); margin-bottom: 10px; font-size: 1.8rem; text-align: center; }
+        .subtitle { text-align: center; color: #9ca3af; margin-bottom: 30px; font-size: 0.95rem; }
+
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 10px; font-weight: 600; color: #e5e7eb; }
+        
+        .file-drop-area {
+            border: 2px dashed var(--border-color); border-radius: 12px; padding: 30px;
+            text-align: center; cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.01);
+        }
+        .file-drop-area:hover { border-color: var(--accent); background: rgba(255, 42, 42, 0.05); }
+
+        select, input[type="number"] {
+            width: 100%; padding: 12px; background: #0b0f19; border: 1px solid var(--border-color);
+            color: white; border-radius: 8px; font-size: 1rem; outline: none;
+        }
+
+        .action-btn {
+            width: 100%; padding: 15px; background: linear-gradient(135deg, #ff2a2a, #b91c1c);
+            color: white; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; box-shadow: 0 0 20px var(--accent-glow); transition: 0.3s;
+        }
+        .action-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        .file-list { margin-top: 10px; font-size: 0.85rem; color: #10b981; }
+        .status-msg { margin-top: 20px; text-align: center; font-weight: bold; color: #10b981; }
+    </style>
+</head>
+<body>
+
+    <div class="training-card">
+        <h1>🛠️ وحدة التدريب وتحليل الملفات</h1>
+        <p class="subtitle">قم برفع الملفات، حدد أيام القفل، وابدأ التدريب الشامل من الغلاف للغلاف</p>
+
+        <!-- زر رفع الملفات (يدعم جميع الصيغ وغير محدود) -->
+        <div class="form-group">
+            <label>1. رفع الملفات (بجميع الصيغ - عدد غير محدود):</label>
+            <div class="file-drop-area" onclick="document.getElementById('trainingFiles').click()">
+                <p>📁 اضغط هنا لرفع الملفات (PDF, TXT, DOCX, Images, وغيرها...)</p>
+                <input type="file" id="trainingFiles" multiple style="display: none;" onchange="showSelectedFiles(this)">
+            </div>
+            <div class="file-list" id="fileList"></div>
+        </div>
+
+        <!-- زر اختيار عدد أيام غلق التطبيق (حد أقصى أسبوع / 7 أيام) -->
+        <div class="form-group">
+            <label>2. حدد عدد أيام غلق تطبيق الذكاء الاصطناعي (بحد أقصى أسبوع):</label>
+            <select id="lockDays">
+                <option value="1">يوم واحد (1)</option>
+                <option value="2">يومان (2)</option>
+                <option value="3">ثلاثة أيام (3)</option>
+                <option value="4">أربعة أيام (4)</option>
+                <option value="5">خمسة أيام (5)</option>
+                <option value="6">ستة أيام (6)</option>
+                <option value="7">أسبوع كامل (7 أيام)</option>
+            </select>
+        </div>
+
+        <!-- زر غلق وتدريب -->
+        <button class="action-btn" onclick="lockAndTrain()">🔒 غلق تطبيق الذكاء الاصطناعي وبدء التدريب</button>
+        <div class="status-msg" id="statusMsg"></div>
+    </div>
+
+    <script>
+        let selectedFilesNames = [];
+
+        function showSelectedFiles(input) {
+            const listDiv = document.getElementById('fileList');
+            listDiv.innerHTML = '';
+            selectedFilesNames = [];
+            for (let f of input.files) {
+                selectedFilesNames.push(f.name);
+            }
+            listDiv.innerText = `تم اختيار ${selectedFilesNames.length} ملفاً بنجاح وقابلة للتحليل الكامل.`;
+        }
+
+        function lockAndTrain() {
+            const days = document.getElementById('lockDays').value;
+            const statusMsg = document.getElementById('statusMsg');
+
+            statusMsg.innerText = "جاري قفل تطبيق الذكاء الاصطناعي وتحليل الملفات من الغلاف للغلاف ودمج البيانات...";
+
+            fetch('/api/start-training', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    days: days,
+                    files_info: selectedFilesNames
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    statusMsg.innerHTML = `✅ تم التدريب ودمج البيانات بنجاح!<br>موعد فتح تطبيق الذكاء الاصطناعي: ${data.unlock_time}`;
+                }
+            })
+            .catch(err => {
+                statusMsg.style.color = "#ff2a2a";
+                statusMsg.innerText = "حدث خطأ أثناء عملية التدريب.";
+            });
+        }
+    </script>
+</body>
+</html>
