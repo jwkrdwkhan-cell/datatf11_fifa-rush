@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.telegram_state.json
+.telegram.json
+.overchat-personas.json
+*.tmp
+.env
